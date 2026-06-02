@@ -1,0 +1,26 @@
+{
+  "name": "EQ30 — Alinhamento Temporal",
+  "short_name": "EQ30",
+  "description": "Equalizador gráfico 30 bandas com delay por banda para simulação car audio",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
+  "orientation": "portrait-primary",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["music", "utilities"]
+}
