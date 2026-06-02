@@ -280,13 +280,13 @@ input[type=range].dl-slider {
 <!-- DELAY FINO -->
 <div class="section">
   <div class="section-header">
-    <span class="section-title">Delay fino por banda — 0 a 10 ms (precisão 0,1 ms)</span>
+    <span class="section-title">Delay fino por banda — 0 a 100 ms (precisão 0,1 ms)</span>
   </div>
   <div class="section-body">
     <div class="fine-row">
       <label>Banda:</label>
       <select id="fineBandSel"></select>
-      <input type="number" id="fineVal" min="0" max="10" step="0.1" value="0" placeholder="ms">
+      <input type="number" id="fineVal" min="0" max="100" step="0.1" value="0" placeholder="ms">
       <button class="btn-apply" onclick="applyFineBand()">Aplicar</button>
       <button class="btn-reset" onclick="resetAllDelays()">Reset tudo</button>
     </div>
@@ -326,7 +326,7 @@ let isPlaying=false,timerInterval;
 let audioEl=null,mediaSource=null,currentObjectURL=null;
 
 function effectiveDelay(i){
-  return Math.min(10,Math.max(0,parseFloat((bandDelay[i]+groupOffset[GROUP_OF[i]]).toFixed(1))));
+  return Math.min(100,Math.max(0,parseFloat((bandDelay[i]+groupOffset[GROUP_OF[i]]).toFixed(1))));
 }
 
 function buildUI(){
@@ -352,7 +352,7 @@ function buildUI(){
     // delay band
     const d=document.createElement('div'); d.className='dband';
     d.innerHTML=`<div class="dval" id="dv${i}">0.0</div>
-<input type="range" class="dl-slider" id="dl${i}" min="0" max="10" value="0" step="0.1" style="accent-color:${hex}">
+<input type="range" class="dl-slider" id="dl${i}" min="0" max="100" value="0" step="0.1" style="accent-color:${hex}">
 <div class="bfreq" style="color:${hex}88">${LABELS[i]}</div>`;
     dg.appendChild(d);
     // select option
@@ -391,7 +391,7 @@ function buildGroupsUI(){
   <span class="group-offset-label">Offset</span>
   <span class="group-offset-val" id="gov${gi}" style="color:${g.hex}">0.0 ms</span>
 </div>
-<input type="range" id="go${gi}" min="-10" max="10" value="0" step="0.1" style="width:100%;accent-color:${g.hex}">`;
+<input type="range" id="go${gi}" min="-100" max="100" value="0" step="0.1" style="width:100%;accent-color:${g.hex}">`;
     gg.appendChild(div);
     document.getElementById('go'+gi).addEventListener('input',e=>{
       groupOffset[gi]=parseFloat(parseFloat(e.target.value).toFixed(1));
@@ -408,7 +408,7 @@ function buildGroupsUI(){
 function updateDelayDisplay(i){
   const eff=effectiveDelay(i);
   document.getElementById('dv'+i).textContent=eff.toFixed(1);
-  document.getElementById('dl'+i).value=Math.min(10,Math.max(0,bandDelay[i]));
+  document.getElementById('dl'+i).value=Math.min(100,Math.max(0,bandDelay[i]));
 }
 
 function applyFineBand(){
@@ -416,7 +416,7 @@ function applyFineBand(){
   const raw=document.getElementById('fineVal').value;
   const v=parseFloat(parseFloat(raw).toFixed(1));
   if(isNaN(v)) return;
-  bandDelay[i]=Math.min(10,Math.max(0,v));
+  bandDelay[i]=Math.min(100,Math.max(0,v));
   updateDelayDisplay(i);
   if(delayNodes[i]) delayNodes[i].delayTime.value=effectiveDelay(i)/1000;
 }
@@ -443,7 +443,7 @@ function initAudioGraph(){
   if(filters.length) return;
   let prev=gainMaster;
   for(let i=BANDS.length-1;i>=0;i--){
-    const delay=audioCtx.createDelay(0.011);
+    const delay=audioCtx.createDelay(0.101);
     const filt=audioCtx.createBiquadFilter();
     filt.type=i===0?'lowshelf':i===29?'highshelf':'peaking';
     filt.frequency.value=BANDS[i];
