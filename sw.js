@@ -1,4 +1,4 @@
-const CACHE = 'eq30-v1';
+const CACHE = 'eq30-v3';
 const ASSETS = [
   './',
   './index.html',
