@@ -70,6 +70,8 @@
             align-items: center;
             gap: 8px;
             transition: all 0.2s ease;
+            text-decoration: none;
+            font-size: 14px;
         }
 
         .btn:hover { transform: translateY(-1px); opacity: 0.9; }
@@ -245,10 +247,11 @@
     <header>
         <h1>ALIGN <span>DSP</span></h1>
         <div class="controls-top">
-            <input type="file" id="audio-file" accept=".mp3,.wav,.m4a,.flac,audio/mp3,audio/mpeg,audio/x-mpeg,audio/x-m4a" style="display: none;">
-            <button class="btn" onclick="document.getElementById('audio-file').click()">
+            <input type="file" id="audio-file" accept="audio/*" style="display: none;">
+            <label for="audio-file" class="btn">
                 <i class="fa-solid fa-folder-open"></i> CARREGAR ÁUDIO
-            </button>
+            </label>
+            
             <button class="btn btn-secondary" id="play-btn">
                 <i class="fa-solid fa-play"></i> PLAY
             </button>
@@ -461,12 +464,9 @@
         initAudio();
         if (source) source.disconnect();
         
-        // CORREÇÃO DO ECO: O sinal original do elemento de áudio NÃO vaza para a saída nativa do browser.
         audio.muted = false; 
-        
         source = audioCtx.createMediaElementSource(audio);
         
-        // Roteamento exclusivo pelo motor DSP. O som passa pelas bandas e deságua apenas no masterGain
         bands.forEach(b => {
             source.connect(b.filter);
             b.filter.connect(b.delay);
@@ -484,7 +484,7 @@
             }
         };
         
-        status.innerText = "Alinhador puro ativo. Duplicação de áudio corrigida.";
+        status.innerText = "Mapeamento ativo. Pronto.";
     }
 
     if ('serviceWorker' in navigator) {
