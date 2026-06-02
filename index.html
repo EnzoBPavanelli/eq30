@@ -1,609 +1,497 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="EQ30">
-<meta name="application-name" content="EQ30">
-<meta name="theme-color" content="#0a0a0f">
-<meta name="description" content="Equalizador gráfico de 30 bandas com alinhamento temporal por grupo — simulador car audio">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon.png">
-<link rel="apple-touch-startup-image" href="icon.png">
-<title>EQ30 — Alinhamento</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #0a0a0f;
-  --bg2: #111118;
-  --bg3: #1a1a24;
-  --border: rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.13);
-  --text: #e8e8f0;
-  --text2: #888899;
-  --text3: #44445a;
-  --sub: #ff5e3a;
-  --low: #ffad2e;
-  --mid: #3ab8ff;
-  --high: #a78bfa;
-  --accent: #3ab8ff;
-  --green: #2ecc7a;
-  --font-mono: 'DM Mono', monospace;
-  --font-display: 'Syne', sans-serif;
-  --r: 10px;
-  --r2: 6px;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { background: var(--bg); color: var(--text); font-family: var(--font-mono); font-size: 14px; }
-body { min-height: 100vh; padding: 0 0 40px; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALIGN DSP - Versão Definitiva</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-main: #0d0e12;
+            --bg-card: #161820;
+            --accent: #deff9a;
+            --text-main: #f5f5f7;
+            --text-muted: #8e8e93;
+            
+            --color-sub: #ff5722;
+            --color-low: #ffc107;
+            --color-mid: #2196f3;
+            --color-high: #9c27b0;
+        }
 
-/* ── header ── */
-.header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 18px 20px 14px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg);
-  position: sticky; top: 0; z-index: 10;
-}
-.logo { font-family: var(--font-display); font-size: 18px; font-weight: 700; letter-spacing: -.02em; }
-.logo span { color: var(--accent); }
-.badge { font-size: 10px; color: var(--text3); border: 1px solid var(--border2); border-radius: 4px; padding: 2px 6px; letter-spacing: .08em; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            outline: none;
+        }
 
-/* ── sections ── */
-.section { margin: 14px 14px 0; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
-.section-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--border); }
-.section-title { font-size: 10px; letter-spacing: .12em; color: var(--text3); text-transform: uppercase; font-weight: 500; }
-.section-body { padding: 14px; }
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Urbanist', sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+        }
 
-/* ── transport ── */
-.transport { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.file-label {
-  display: flex; align-items: center; gap: 6px;
-  padding: 8px 14px; border: 1px solid var(--border2); border-radius: var(--r2);
-  cursor: pointer; font-size: 12px; color: var(--text2); transition: all .15s;
-  font-family: var(--font-mono);
-}
-.file-label:hover { border-color: var(--accent); color: var(--accent); }
-#fileInput { display: none; }
-#playBtn {
-  display: flex; align-items: center; gap: 7px;
-  padding: 8px 18px; border: 1px solid var(--accent); border-radius: var(--r2);
-  background: transparent; color: var(--accent); cursor: pointer;
-  font-family: var(--font-mono); font-size: 13px; transition: all .15s;
-}
-#playBtn:hover { background: var(--accent); color: var(--bg); }
-#playBtn:active { transform: scale(0.97); }
-#timeDisplay { font-size: 11px; color: var(--text2); margin-left: auto; font-variant-numeric: tabular-nums; }
-.vol-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
-.vol-row label { font-size: 11px; color: var(--text2); min-width: 52px; }
-.vol-row span { font-size: 11px; color: var(--text); min-width: 36px; }
-#statusMsg { font-size: 11px; color: var(--text3); margin-top: 8px; }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background: var(--bg-card);
+            border-radius: 14px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
 
-/* ── canvas ── */
-#eqCurve { display: block; width: 100%; height: 80px; border-radius: var(--r2); background: var(--bg3); }
+        h1 { font-size: 24px; font-weight: 700; }
+        h1 span { color: var(--accent); }
 
-/* ── presets ── */
-.presets { display: flex; gap: 6px; flex-wrap: wrap; }
-.preset-btn {
-  font-size: 11px; padding: 5px 12px;
-  border: 1px solid var(--border2); border-radius: var(--r2);
-  background: transparent; color: var(--text2); cursor: pointer;
-  font-family: var(--font-mono); transition: all .15s;
-}
-.preset-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .controls-top {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
 
-/* ── sliders ── */
-input[type=range] {
-  -webkit-appearance: none; appearance: none;
-  background: transparent; cursor: pointer;
-}
-input[type=range]::-webkit-slider-runnable-track {
-  height: 3px; border-radius: 2px; background: var(--border2);
-}
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 14px; height: 14px;
-  border-radius: 50%; margin-top: -5.5px;
-  background: var(--accent); border: 2px solid var(--bg2);
-  transition: transform .1s;
-}
-input[type=range]::-webkit-slider-thumb:active { transform: scale(1.3); }
-input[type=range].eq-slider {
-  writing-mode: vertical-lr; direction: rtl;
-  width: 22px; height: 96px;
-}
-input[type=range].dl-slider {
-  writing-mode: vertical-lr; direction: rtl;
-  width: 22px; height: 64px;
-}
+        .btn {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
 
-/* ── bands ── */
-.bands-scroll { overflow-x: auto; padding-bottom: 6px; }
-.bands-scroll::-webkit-scrollbar { height: 3px; }
-.bands-scroll::-webkit-scrollbar-track { background: var(--bg3); }
-.bands-scroll::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-.bands-flex { display: flex; gap: 3px; min-width: max-content; }
-.band { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 46px; padding: 4px 0; }
-.bval { font-size: 9px; font-weight: 500; color: var(--text); text-align: center; min-height: 12px; font-variant-numeric: tabular-nums; }
-.bfreq { font-size: 9px; color: var(--text3); text-align: center; }
-.band-sep { width: 1px; background: var(--border); margin: 0 1px; align-self: stretch; }
+        .btn:hover { transform: translateY(-1px); opacity: 0.9; }
+        .btn-secondary { background: #2c2c35; color: var(--text-main); }
+        .btn-danger { background: #ff3b30; color: #fff; }
 
-/* ── groups ── */
-.groups-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-@media (min-width: 600px) { .groups-grid { grid-template-columns: repeat(4, 1fr); } }
-.group-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r2); padding: 12px; }
-.group-name { font-family: var(--font-display); font-size: 13px; font-weight: 600; margin-bottom: 2px; }
-.group-range { font-size: 9px; color: var(--text3); margin-bottom: 10px; letter-spacing: .04em; }
-.group-offset { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-.group-offset-label { font-size: 10px; color: var(--text2); }
-.group-offset-val { font-size: 11px; font-weight: 500; font-variant-numeric: tabular-nums; min-width: 54px; text-align: right; }
-.group-offset input[type=range] { width: 100%; }
+        .status {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
 
-/* ── fine editor ── */
-.fine-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-.fine-row label { font-size: 11px; color: var(--text2); }
-.fine-row select {
-  font-family: var(--font-mono); font-size: 11px;
-  background: var(--bg3); color: var(--text);
-  border: 1px solid var(--border2); border-radius: var(--r2);
-  padding: 5px 8px; cursor: pointer;
-}
-.fine-row input[type=number] {
-  width: 70px; font-family: var(--font-mono); font-size: 12px;
-  background: var(--bg3); color: var(--text);
-  border: 1px solid var(--border2); border-radius: var(--r2);
-  padding: 5px 8px;
-}
-.fine-row input[type=number]:focus { outline: none; border-color: var(--green); }
-.btn-apply {
-  padding: 5px 14px; font-family: var(--font-mono); font-size: 11px;
-  border: 1px solid var(--green); border-radius: var(--r2);
-  background: transparent; color: var(--green); cursor: pointer; transition: all .15s;
-}
-.btn-apply:hover { background: var(--green); color: var(--bg); }
-.btn-reset {
-  padding: 5px 14px; font-family: var(--font-mono); font-size: 11px;
-  border: 1px solid var(--border2); border-radius: var(--r2);
-  background: transparent; color: var(--text2); cursor: pointer; transition: all .15s;
-}
-.btn-reset:hover { border-color: var(--sub); color: var(--sub); }
+        /* Grid de Delay das 30 Bandas (Disposição Horizontal Homogénea) */
+        .matrix-container {
+            background: var(--bg-card);
+            border-radius: 14px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
 
-/* ── delay display ── */
-.delay-flex { display: flex; gap: 3px; min-width: max-content; }
-.dband { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 46px; padding: 4px 0; }
-.dval { font-size: 9px; font-weight: 500; color: var(--text); text-align: center; min-height: 12px; font-variant-numeric: tabular-nums; }
+        .band-row {
+            background: #1c1e27;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border-left: 3px solid #fff;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
 
-/* ── info footer ── */
-.info-footer { margin: 14px; font-size: 10px; color: var(--text3); text-align: center; line-height: 1.7; }
-.info-footer a { color: var(--text3); }
+        .band-row.sub { border-left-color: var(--color-sub); }
+        .band-row.low { border-left-color: var(--color-low); }
+        .band-row.mid { border-left-color: var(--color-mid); }
+        .band-row.high { border-left-color: var(--color-high); }
 
-/* ── group colors ── */
-.g0 { color: var(--sub); }
-.g1 { color: var(--low); }
-.g2 { color: var(--mid); }
-.g3 { color: var(--high); }
-</style>
+        .band-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .band-title {
+            font-size: 12px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .control-pack {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Inputs Numéricos */
+        .delay-input {
+            width: 54px;
+            background: #0d0e12;
+            border: 1px solid #3a3a4c;
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            text-align: center;
+            padding: 3px 0;
+            border-radius: 4px;
+        }
+
+        .delay-input::-webkit-inner-spin-button, 
+        .delay-input::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+
+        /* Sliders Horizontais Nativos Robustos */
+        .fader-horizontal {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #2d3142;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .fader-horizontal::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--text-main);
+        }
+
+        /* Painel Macroscópico de Grupos */
+        .groups-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .group-card {
+            background: var(--bg-card);
+            padding: 15px 20px;
+            border-radius: 12px;
+            border-top: 4px solid #fff;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .group-card.sub { border-top-color: var(--color-sub); }
+        .group-card.low { border-top-color: var(--color-low); }
+        .group-card.mid { border-top-color: var(--color-mid); }
+        .group-card.high { border-top-color: var(--color-high); }
+
+        .group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .group-slider-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .group-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 4px;
+            background: #232530;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        .group-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--text-main);
+        }
+
+        .btn-reset-small {
+            background: #2c2c35;
+            color: var(--text-muted);
+            border: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            transition: all 0.2s;
+        }
+
+        .btn-reset-small:hover { background: #ff3b30; color: #fff; }
+    </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="logo">EQ<span>30</span></div>
-  <div class="badge">ALINHAMENTO TEMPORAL</div>
-</div>
+    <header>
+        <h1>ALIGN <span>DSP</span></h1>
+        <div class="controls-top">
+            <input type="file" id="audio-file" accept="audio/*" style="display: none;">
+            <button class="btn" onclick="document.getElementById('audio-file').click()">
+                <i class="fa-solid fa-folder-open"></i> CARREGAR ÁUDIO
+            </button>
+            <button class="btn btn-secondary" id="play-btn">
+                <i class="fa-solid fa-play"></i> PLAY
+            </button>
+            <button class="btn btn-danger" onclick="resetAll()">
+                <i class="fa-solid fa-rotate-left"></i> ZERAR DELAYS
+            </button>
+            <div class="status" id="status">Aguardando ficheiro...</div>
+        </div>
+    </header>
 
-<!-- TRANSPORT -->
-<div class="section">
-  <div class="section-header">
-    <span class="section-title">Reprodução</span>
-  </div>
-  <div class="section-body">
-    <div class="transport">
-      <label class="file-label" onclick="document.getElementById('fileInput').click()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-        Carregar áudio
-      </label>
-      <input type="file" id="fileInput" accept="audio/*, audio/mpeg, audio/mp4, audio/wav, audio/flac, audio/ogg, audio/aac, audio/x-m4a, .mp3, .wav, .flac, .ogg, .aac, .m4a, .opus" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
-      <button id="playBtn">
-        <svg id="playIcon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
-        Play
-      </button>
-      <span id="timeDisplay">0:00 / 0:00</span>
-    </div>
-    <div class="vol-row">
-      <label>Volume</label>
-      <input type="range" id="masterVol" min="0" max="150" value="100" step="1" style="width:130px">
-      <span id="masterVolVal">100%</span>
-    </div>
-    <div id="statusMsg">Carregue um arquivo MP3, WAV ou FLAC.</div>
-    <div style="margin-top:10px;padding:10px;background:var(--bg3);border-radius:var(--r2);border:1px solid var(--border2)">
-      <div style="font-size:10px;color:var(--text3);margin-bottom:8px;line-height:1.6">
-        Se o botão não abrir os arquivos: no Android, vá em <b style="color:var(--text2)">Configurações → Apps → Chrome → Permissões → Arquivos e mídia → Permitir</b>. Ou cole uma URL de áudio abaixo:
-      </div>
-      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-        <input type="url" id="urlInput" placeholder="https://... (URL de áudio MP3/WAV)" style="flex:1;min-width:180px;font-size:11px;padding:6px 10px;background:var(--bg2);color:var(--text);border:1px solid var(--border2);border-radius:var(--r2);font-family:var(--font-mono)">
-        <button class="btn-apply" onclick="loadFromURL()" style="white-space:nowrap">Carregar URL</button>
-      </div>
-    </div>
-</div>
+    <main>
+        <div class="matrix-container" id="matrix-grid"></div>
 
-<!-- EQ CURVE -->
-<div class="section">
-  <div class="section-header">
-    <span class="section-title">Curva de resposta</span>
-    <div style="display:flex;gap:10px;font-size:10px;">
-      <span class="g0">● Sub</span>
-      <span class="g1">● Baixo-médio</span>
-      <span class="g2">● Médio</span>
-      <span class="g3">● Agudo</span>
-    </div>
-  </div>
-  <div class="section-body" style="padding:10px 14px">
-    <canvas id="eqCurve" height="80"></canvas>
-  </div>
-</div>
+        <div class="groups-container">
+            <div class="group-card sub">
+                <div class="group-header" style="color: var(--color-sub);">
+                    <span>GRUPO SUB (25Hz - 80Hz)</span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span id="val-sub">0.0 ms</span>
+                        <button class="btn-reset-small" onclick="resetGroup('sub')" title="Zerar Grupo Sub"><i class="fa-solid fa-undo"></i></button>
+                    </div>
+                </div>
+                <div class="group-slider-wrap">
+                    <input type="range" id="slider-sub" min="-50" max="50" value="0" step="0.1" class="group-slider" oninput="updateGroup('sub', this.value)">
+                </div>
+            </div>
 
-<!-- EQ GANHO -->
-<div class="section">
-  <div class="section-header">
-    <span class="section-title">Equalizador — ganho por banda (dB)</span>
-  </div>
-  <div class="section-body">
-    <div class="presets" style="margin-bottom:12px">
-      <button class="preset-btn" onclick="applyPreset('flat')">Flat</button>
-      <button class="preset-btn" onclick="applyPreset('bass')">Bass boost</button>
-      <button class="preset-btn" onclick="applyPreset('vshape')">V-shape</button>
-      <button class="preset-btn" onclick="applyPreset('presence')">Presence</button>
-      <button class="preset-btn" onclick="applyPreset('sub')">Sub boost</button>
-    </div>
-    <div class="bands-scroll">
-      <div class="bands-flex" id="bandsGrid"></div>
-    </div>
-  </div>
-</div>
+            <div class="group-card low">
+                <div class="group-header" style="color: var(--color-low);">
+                    <span>GRUPO LOW-MID (100Hz - 400Hz)</span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span id="val-low">0.0 ms</span>
+                        <button class="btn-reset-small" onclick="resetGroup('low')" title="Zerar Grupo Low"><i class="fa-solid fa-undo"></i></button>
+                    </div>
+                </div>
+                <div class="group-slider-wrap">
+                    <input type="range" id="slider-low" min="-50" max="50" value="0" step="0.1" class="group-slider" oninput="updateGroup('low', this.value)">
+                </div>
+            </div>
 
-<!-- GROUP ALIGNMENT -->
-<div class="section">
-  <div class="section-header">
-    <span class="section-title">Adiantamento por grupo</span>
-  </div>
-  <div class="section-body">
-    <p style="font-size:10px;color:var(--text3);margin-bottom:12px;line-height:1.6">
-      Valores negativos adiantam o grupo (chegam antes). Positivos atrasam. Ideal para alinhar sub vs satélites: adiante o sub ou atrase os agudos até a fase coincidir.
-    </p>
-    <div class="groups-grid" id="groupsGrid"></div>
-  </div>
-</div>
+            <div class="group-card mid">
+                <div class="group-header" style="color: var(--color-mid);">
+                    <span>GRUPO MID (500Hz - 4kHz)</span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span id="val-mid">0.0 ms</span>
+                        <button class="btn-reset-small" onclick="resetGroup('mid')" title="Zerar Grupo Mid"><i class="fa-solid fa-undo"></i></button>
+                    </div>
+                </div>
+                <div class="group-slider-wrap">
+                    <input type="range" id="slider-mid" min="-50" max="50" value="0" step="0.1" class="group-slider" oninput="updateGroup('mid', this.value)">
+                </div>
+            </div>
 
-<!-- DELAY FINO -->
-<div class="section">
-  <div class="section-header">
-    <span class="section-title">Delay fino por banda — 0 a 1000 ms (precisão 0,1 ms)</span>
-  </div>
-  <div class="section-body">
-    <div class="fine-row">
-      <label>Banda:</label>
-      <select id="fineBandSel"></select>
-      <input type="number" id="fineVal" min="0" max="1000" step="0.1" value="0" placeholder="ms">
-      <button class="btn-apply" onclick="applyFineBand()">Aplicar</button>
-      <button class="btn-reset" onclick="resetAllDelays()">Reset tudo</button>
-    </div>
-    <div class="bands-scroll">
-      <div class="delay-flex" id="delayGrid"></div>
-    </div>
-    <p style="font-size:10px;color:var(--text3);margin-top:10px">
-      Valor exibido = delay individual + offset do grupo. Deslize o thumb ou use o campo acima.
-    </p>
-  </div>
-</div>
-
-<div class="info-footer">
-  EQ30 · Web Audio API · Funciona offline como PWA<br>
-  No Chrome: menu ⋮ → "Adicionar à tela inicial"
-</div>
+            <div class="group-card high">
+                <div class="group-header" style="color: var(--color-high);">
+                    <span>GRUPO HIGH (5kHz - 20kHz)</span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span id="val-high">0.0 ms</span>
+                        <button class="btn-reset-small" onclick="resetGroup('high')" title="Zerar Grupo High"><i class="fa-solid fa-undo"></i></button>
+                    </div>
+                </div>
+                <div class="group-slider-wrap">
+                    <input type="range" id="slider-high" min="-50" max="50" value="0" step="0.1" class="group-slider" oninput="updateGroup('high', this.value)">
+                </div>
+            </div>
+        </div>
+    </main>
 
 <script>
-const BANDS=[20,25,31.5,40,50,63,80,100,125,160,200,250,315,400,500,630,800,1000,1250,1600,2000,2500,3150,4000,5000,6300,8000,10000,12500,16000];
-const LABELS=['20','25','31','40','50','63','80','100','125','160','200','250','315','400','500','630','800','1k','1.25k','1.6k','2k','2.5k','3.15k','4k','5k','6.3k','8k','10k','12.5k','16k'];
+    const freqs = [25, 31.5, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000];
+    
+    const groups = {
+        sub: [25, 31.5, 40, 50, 63, 80],
+        low: [100, 125, 160, 200, 250, 315, 400],
+        mid: [500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000],
+        high: [5000, 6300, 8000, 10000, 12500, 16000, 20000]
+    };
 
-const GROUPS=[
-  {name:'Sub',range:'20 – 80 Hz',color:'var(--sub)',hex:'#ff5e3a',bands:[0,1,2,3,4,5,6]},
-  {name:'Baixo-médio',range:'100 – 500 Hz',color:'var(--low)',hex:'#ffad2e',bands:[7,8,9,10,11,12,13,14]},
-  {name:'Médio',range:'630 Hz – 3,15 kHz',color:'var(--mid)',hex:'#3ab8ff',bands:[15,16,17,18,19,20,21,22]},
-  {name:'Agudo',range:'4 – 16 kHz',color:'var(--high)',hex:'#a78bfa',bands:[23,24,25,26,27,28,29]},
-];
+    let audioCtx, source, masterGain;
+    let bands = [];
+    
+    // Arrays de Estado Isolados e Protegidos
+    let manualDelays = new Array(freqs.length).fill(0);
+    let groupOffsets = { sub: 0, low: 0, mid: 0, high: 0 };
 
-const GROUP_OF=[];
-GROUPS.forEach((g,gi)=>g.bands.forEach(b=>GROUP_OF[b]=gi));
+    const grid = document.getElementById('matrix-grid');
+    const playBtn = document.getElementById('play-btn');
+    const status = document.getElementById('status');
 
-const groupOffset=[0,0,0,0];
-const bandDelay=Array(30).fill(0);
+    // Construção Dinâmica da Interface de Matriz Horizontal Estável
+    freqs.forEach((f, i) => {
+        const card = document.createElement('div');
+        let groupClass = 'high';
+        if (groups.sub.includes(f)) groupClass = 'sub';
+        else if (groups.low.includes(f)) groupClass = 'low';
+        else if (groups.mid.includes(f)) groupClass = 'mid';
 
-let audioCtx,sourceNode,gainMaster,filters=[],delayNodes=[];
-let isPlaying=false,timerInterval;
-let audioEl=null,mediaSource=null,currentObjectURL=null;
+        card.className = `band-row ${groupClass}`;
+        card.innerHTML = `
+            <div class="band-meta">
+                <span class="band-title" style="color: var(--color-${groupClass})">${f < 1000 ? f + ' Hz' : (f/1000) + ' kHz'}</span>
+                <div class="control-pack">
+                    <input type="number" class="delay-input" id="delay-${i}" value="0.0" step="0.1" min="0" max="250">
+                </div>
+            </div>
+            <input type="range" class="fader-horizontal" min="0" max="200" value="0" step="0.1" id="fader-${i}">
+        `;
+        grid.appendChild(card);
+    });
 
-function effectiveDelay(i){
-  return Math.min(1000,Math.max(0,parseFloat((bandDelay[i]+groupOffset[GROUP_OF[i]]).toFixed(1))));
-}
+    async function initAudio() {
+        if (audioCtx) return;
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        masterGain = audioCtx.createGain();
+        masterGain.connect(audioCtx.destination);
+        
+        freqs.forEach((f, i) => {
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.value = f;
+            filter.Q.value = 4.31;
 
-function buildUI(){
-  const bg=document.getElementById('bandsGrid');
-  const dg=document.getElementById('delayGrid');
-  const sel=document.getElementById('fineBandSel');
-  bg.innerHTML=''; dg.innerHTML=''; sel.innerHTML='';
+            const delay = audioCtx.createDelay(2.5); 
+            delay.delayTime.value = 0;
 
-  BANDS.forEach((_,i)=>{
-    const gi=GROUP_OF[i];
-    const hex=GROUPS[gi].hex;
-    // separator between groups
-    if(i>0 && GROUP_OF[i]!==GROUP_OF[i-1]){
-      const sep=document.createElement('div'); sep.className='band-sep'; bg.appendChild(sep);
-      const sep2=document.createElement('div'); sep2.className='band-sep'; dg.appendChild(sep2);
+            bands.push({ filter, delay, freq: f });
+
+            // Evento estável de arrasto do slider horizontal
+            document.getElementById(`fader-${i}`).addEventListener('input', (e) => {
+                manualDelays[i] = parseFloat(e.target.value) || 0;
+                processDataFlow(i, 'fader');
+            });
+            
+            // Evento estável de introdução na caixa numérica
+            document.getElementById(`delay-${i}`).addEventListener('change', (e) => {
+                let inputVal = parseFloat(e.target.value) || 0;
+                inputVal = Math.max(0, Math.min(250, inputVal));
+                
+                const group = getGroupName(f);
+                // O valor digitado define o ponto final, adaptando a posição do fader em conformidade
+                manualDelays[i] = Math.max(0, inputVal - groupOffsets[group]);
+                
+                processDataFlow(i, 'input');
+            });
+        });
     }
-    // eq band
-    const b=document.createElement('div'); b.className='band';
-    b.innerHTML=`<div class="bval" id="ev${i}">0.0</div>
-<input type="range" class="eq-slider" id="eq${i}" min="-18" max="18" value="0" step="0.5" style="accent-color:${hex}">
-<div class="bfreq" style="color:${hex}88">${LABELS[i]}</div>`;
-    bg.appendChild(b);
-    // delay band
-    const d=document.createElement('div'); d.className='dband';
-    d.innerHTML=`<div class="dval" id="dv${i}">0.0</div>
-<input type="range" class="dl-slider" id="dl${i}" min="0" max="1000" value="0" step="0.1" style="accent-color:${hex}">
-<div class="bfreq" style="color:${hex}88">${LABELS[i]}</div>`;
-    dg.appendChild(d);
-    // select option
-    const opt=document.createElement('option');
-    opt.value=i; opt.textContent=LABELS[i]+(i<18?' Hz':' Hz');
-    sel.appendChild(opt);
-  });
 
-  BANDS.forEach((_,i)=>{
-    document.getElementById('eq'+i).addEventListener('input',e=>{
-      const v=parseFloat(e.target.value);
-      document.getElementById('ev'+i).textContent=(v>=0?'+':'')+v.toFixed(1);
-      if(filters[i]) filters[i].gain.value=v;
-      drawCurve();
-    });
-    document.getElementById('dl'+i).addEventListener('input',e=>{
-      bandDelay[i]=parseFloat(parseFloat(e.target.value).toFixed(1));
-      updateDelayDisplay(i);
-      if(delayNodes[i]) delayNodes[i].delayTime.value=effectiveDelay(i)/1000;
-    });
-  });
+    function getGroupName(freq) {
+        if (groups.sub.includes(freq)) return 'sub';
+        if (groups.low.includes(freq)) return 'low';
+        if (groups.mid.includes(freq)) return 'mid';
+        return 'high';
+    }
 
-  buildGroupsUI();
-  drawCurve();
-}
+    // Fluxo de Processamento Unidirecional (Imutável, Sem Loops)
+    function processDataFlow(i, origin) {
+        const freq = freqs[i];
+        const group = getGroupName(freq);
+        
+        // Cálculo Real Consolidado: Valor Próprio da Banda + Offset de Deslocamento do Grupo
+        const calculatedTotal = Math.max(0, manualDelays[i] + groupOffsets[group]);
 
-function buildGroupsUI(){
-  const gg=document.getElementById('groupsGrid');
-  gg.innerHTML='';
-  GROUPS.forEach((g,gi)=>{
-    const div=document.createElement('div'); div.className='group-card';
-    div.innerHTML=`
-<div class="group-name" style="color:${g.hex}">${g.name}</div>
-<div class="group-range">${g.range}</div>
-<div class="group-offset">
-  <span class="group-offset-label">Offset</span>
-  <span class="group-offset-val" id="gov${gi}" style="color:${g.hex}">0.0 ms</span>
-</div>
-<input type="range" id="go${gi}" min="-1000" max="1000" value="0" step="0.1" style="width:100%;accent-color:${g.hex}">`;
-    gg.appendChild(div);
-    document.getElementById('go'+gi).addEventListener('input',e=>{
-      groupOffset[gi]=parseFloat(parseFloat(e.target.value).toFixed(1));
-      const v=groupOffset[gi];
-      document.getElementById('gov'+gi).textContent=(v>0?'+':'')+v.toFixed(1)+' ms';
-      g.bands.forEach(b=>{
-        updateDelayDisplay(b);
-        if(delayNodes[b]) delayNodes[b].delayTime.value=effectiveDelay(b)/1000;
-      });
-    });
-  });
-}
+        // 1. Atualização Instantânea no Motor de Áudio
+        if (audioCtx && bands[i]) {
+            bands[i].delay.delayTime.setTargetAtTime(calculatedTotal / 1000, audioCtx.currentTime, 0.005);
+        }
 
-function updateDelayDisplay(i){
-  const eff=effectiveDelay(i);
-  document.getElementById('dv'+i).textContent=eff.toFixed(1);
-  document.getElementById('dl'+i).value=Math.min(1000,Math.max(0,bandDelay[i]));
-}
+        // 2. Sincronização Estrita da Interface Visual
+        const inputField = document.getElementById(`delay-${i}`);
+        const faderField = document.getElementById(`fader-${i}`);
 
-function applyFineBand(){
-  const i=parseInt(document.getElementById('fineBandSel').value);
-  const raw=document.getElementById('fineVal').value;
-  const v=parseFloat(parseFloat(raw).toFixed(1));
-  if(isNaN(v)) return;
-  bandDelay[i]=Math.min(1000,Math.max(0,v));
-  updateDelayDisplay(i);
-  if(delayNodes[i]) delayNodes[i].delayTime.value=effectiveDelay(i)/1000;
-}
+        inputField.value = calculatedTotal.toFixed(1);
 
-function resetAllDelays(){
-  for(let i=0;i<30;i++){
-    bandDelay[i]=0; updateDelayDisplay(i);
-    if(delayNodes[i]) delayNodes[i].delayTime.value=0;
-  }
-  GROUPS.forEach((_,gi)=>{
-    groupOffset[gi]=0;
-    document.getElementById('go'+gi).value=0;
-    document.getElementById('gov'+gi).textContent='0.0 ms';
-  });
-}
+        if (origin !== 'fader') {
+            faderField.value = manualDelays[i].toFixed(1);
+        }
+    }
 
-function initAudioGraph(){
-  if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-  if(!gainMaster){
-    gainMaster=audioCtx.createGain();
-    gainMaster.gain.value=parseInt(document.getElementById('masterVol').value)/100;
-    gainMaster.connect(audioCtx.destination);
-  }
-  if(filters.length) return;
-  let prev=gainMaster;
-  for(let i=BANDS.length-1;i>=0;i--){
-    const delay=audioCtx.createDelay(1.001);
-    const filt=audioCtx.createBiquadFilter();
-    filt.type=i===0?'lowshelf':i===29?'highshelf':'peaking';
-    filt.frequency.value=BANDS[i];
-    filt.Q.value=4.3;
-    filt.gain.value=parseFloat(document.getElementById('eq'+i).value);
-    delay.delayTime.value=effectiveDelay(i)/1000;
-    delay.connect(filt);
-    filt.connect(prev);
-    filters.unshift(filt);
-    delayNodes.unshift(delay);
-    prev=delay;
-  }
-  if(audioEl && !mediaSource){
-    mediaSource=audioCtx.createMediaElementSource(audioEl);
-    mediaSource.connect(delayNodes[0]);
-  }
-}
+    // Controlo de Alteração do Grupo Macro
+    window.updateGroup = (group, val) => {
+        const parsedVal = parseFloat(val);
+        groupOffsets[group] = parsedVal;
+        
+        document.getElementById(`val-${group}`).innerText = `${parsedVal > 0 ? '+' : ''}${parsedVal.toFixed(1)} ms`;
+        
+        freqs.forEach((f, i) => {
+            if (groups[group].includes(f)) {
+                processDataFlow(i, 'group');
+            }
+        });
+    };
 
-document.getElementById('fileInput').addEventListener('change',e=>{
-  const f=e.target.files[0]; if(!f) return;
-  if(currentObjectURL) URL.revokeObjectURL(currentObjectURL);
-  currentObjectURL = URL.createObjectURL(f);
-  setupAudioEl(currentObjectURL, f.name);
-});
+    window.resetGroup = (group) => {
+        document.getElementById(`slider-${group}`).value = 0;
+        window.updateGroup(group, 0);
+    };
 
-function fmtTime(s){
-  const m=Math.floor(s/60),sec=Math.floor(s%60);
-  return m+':'+(sec<10?'0':'')+sec;
-}
+    window.resetAll = () => {
+        ['sub', 'low', 'mid', 'high'].forEach(g => resetGroup(g));
+        
+        freqs.forEach((f, i) => {
+            manualDelays[i] = 0;
+            document.getElementById(`fader-${i}`).value = 0;
+            processDataFlow(i, 'reset');
+        });
+    };
 
-function updateTime(){
-  if(!audioEl||!audioEl.duration){document.getElementById('timeDisplay').textContent='0:00 / 0:00';return;}
-  document.getElementById('timeDisplay').textContent=fmtTime(audioEl.currentTime)+' / '+fmtTime(audioEl.duration);
-}
+    document.getElementById('audio-file').onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const url = URL.createObjectURL(file);
+        const audio = new Audio(url);
+        audio.loop = true;
+        
+        setupPlayer(audio);
+    };
 
-const playPauseSVG={
-  play:'<polygon points="5,3 19,12 5,21"/>',
-  pause:'<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>'
-};
+    function setupPlayer(audio) {
+        initAudio();
+        if (source) source.disconnect();
+        
+        source = audioCtx.createMediaElementSource(audio);
+        
+        bands.forEach(b => {
+            source.connect(b.filter);
+            b.filter.connect(b.delay);
+            b.delay.connect(masterGain);
+        });
 
-document.getElementById('playBtn').addEventListener('click',()=>{
-  if(!audioEl||!audioEl.src){
-    document.getElementById('statusMsg').textContent='Carregue um arquivo primeiro.';
-    document.getElementById('statusMsg').style.color='var(--sub)';
-    return;
-  }
-  if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-  if(audioCtx.state==='suspended') audioCtx.resume();
-  initAudioGraph();
-  if(isPlaying){
-    audioEl.pause(); isPlaying=false; clearInterval(timerInterval);
-    document.getElementById('playIcon').innerHTML=playPauseSVG.play;
-    document.getElementById('playBtn').lastChild.textContent=' Play';
-  } else {
-    audioEl.play().then(()=>{
-      isPlaying=true;
-      document.getElementById('playIcon').innerHTML=playPauseSVG.pause;
-      document.getElementById('playBtn').lastChild.textContent=' Pause';
-      timerInterval=setInterval(updateTime,300);
-    }).catch(err=>{
-      document.getElementById('statusMsg').textContent='Erro ao reproduzir: '+err.message;
-      document.getElementById('statusMsg').style.color='var(--sub)';
-    });
-  }
-});
-
-document.getElementById('masterVol').addEventListener('input',e=>{
-  const v=parseInt(e.target.value);
-  document.getElementById('masterVolVal').textContent=v+'%';
-  if(gainMaster) gainMaster.gain.value=v/100;
-  if(audioEl) audioEl.volume=Math.min(1,v/100);
-});
-
-const PRESETS={
-  flat:Array(30).fill(0),
-  bass:[10,9,8,7,6,5,4,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  vshape:[8,7,6,5,4,3,2,1,0,-1,-2,-3,-3,-3,-3,-3,-2,-1,0,1,2,3,4,5,6,7,7,7,6,5],
-  presence:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,3,4,5,6,7,7,6,5,4,3,2,1,0,0],
-  sub:[12,12,11,10,8,6,4,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-};
-
-function applyPreset(name){
-  PRESETS[name].forEach((v,i)=>{
-    document.getElementById('eq'+i).value=v;
-    document.getElementById('ev'+i).textContent=(v>=0?'+':'')+v.toFixed(1);
-    if(filters[i]) filters[i].gain.value=v;
-  });
-  drawCurve();
-}
-
-function drawCurve(){
-  const canvas=document.getElementById('eqCurve');
-  const ctx=canvas.getContext('2d');
-  const W=canvas.offsetWidth||340, H=80;
-  canvas.width=W*window.devicePixelRatio; canvas.height=H*window.devicePixelRatio;
-  canvas.style.width=W+'px'; canvas.style.height=H+'px';
-  ctx.scale(window.devicePixelRatio,window.devicePixelRatio);
-  ctx.clearRect(0,0,W,H);
-  // zero line
-  ctx.beginPath(); ctx.moveTo(0,H/2); ctx.lineTo(W,H/2);
-  ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=1; ctx.stroke();
-  // per-group curves
-  const hexes=['#ff5e3a','#ffad2e','#3ab8ff','#a78bfa'];
-  GROUPS.forEach((g,gi)=>{
-    ctx.beginPath();
-    g.bands.forEach((bi,idx)=>{
-      const v=parseFloat(document.getElementById('eq'+bi).value);
-      const x=(bi/(BANDS.length-1))*W;
-      const y=H-((v+18)/36)*H;
-      idx===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-    });
-    ctx.strokeStyle=hexes[gi]; ctx.lineWidth=1.5; ctx.stroke();
-  });
-}
-
-function setupAudioEl(src, name){
-  const isNew = !audioEl;
-  if(!audioEl){
-    audioEl = new Audio();
-    audioEl.crossOrigin = 'anonymous';
-    audioEl.preload = 'metadata';
-    audioEl.addEventListener('timeupdate', updateTime);
-    audioEl.addEventListener('ended', ()=>{
-      isPlaying=false; clearInterval(timerInterval);
-      document.getElementById('playIcon').innerHTML=playPauseSVG.play;
-      document.getElementById('playBtn').lastChild.textContent=' Play';
-      updateTime();
-    });
-  }
-  if(isPlaying){ audioEl.pause(); isPlaying=false; clearInterval(timerInterval);
-    document.getElementById('playIcon').innerHTML=playPauseSVG.play;
-    document.getElementById('playBtn').lastChild.textContent=' Play';
-  }
-  audioEl.src = src;
-  audioEl.load();
-  audioEl.addEventListener('loadedmetadata', ()=>{
-    document.getElementById('statusMsg').textContent = name + ' — ' + fmtTime(audioEl.duration);
-    document.getElementById('statusMsg').style.color = 'var(--green)';
-    updateTime();
-  }, {once:true});
-  audioEl.addEventListener('error', ()=>{
-    document.getElementById('statusMsg').textContent = 'Erro: formato não suportado ou acesso negado.';
-    document.getElementById('statusMsg').style.color = 'var(--sub)';
-  }, {once:true});
-}
-
-function loadFromURL(){
-  const url = document.getElementById('urlInput').value.trim();
-  if(!url){ return; }
-  document.getElementById('statusMsg').textContent = 'Carregando...';
-  document.getElementById('statusMsg').style.color = 'var(--text2)';
-  setupAudioEl(url, url.split('/').pop() || 'áudio');
-}
-
-buildUI();
-window.addEventListener('resize', drawCurve);
-
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js').catch(()=>{});
-}
+        playBtn.onclick = () => {
+            if (audio.paused) {
+                audioCtx.resume();
+                audio.play();
+                playBtn.innerHTML = '<i class="fa-solid fa-pause"></i> PAUSE';
+            } else {
+                audio.pause();
+                playBtn.innerHTML = '<i class="fa-solid fa-play"></i> PLAY';
+            }
+        };
+        
+        status.innerText = "Faders horizontais nativos ativos. Pronto.";
+    }
 </script>
 </body>
 </html>
