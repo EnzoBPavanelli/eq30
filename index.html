@@ -82,7 +82,7 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Grid de Delay das 30 Bandas (Disposição Horizontal Homogénea) */
+        /* Grid de Delay das 30 Bandas (Disposição Horizontal Homogênea) */
         .matrix-container {
             background: var(--bg-card);
             border-radius: 14px;
@@ -245,7 +245,7 @@
     <header>
         <h1>ALIGN <span>DSP</span></h1>
         <div class="controls-top">
-            <input type="file" id="audio-file" accept="audio/*" style="display: none;">
+            <input type="file" id="audio-file" accept=".mp3,.wav,.m4a,.flac,audio/mp3,audio/mpeg,audio/x-mpeg,audio/x-m4a" style="display: none;">
             <button class="btn" onclick="document.getElementById('audio-file').click()">
                 <i class="fa-solid fa-folder-open"></i> CARREGAR ÁUDIO
             </button>
@@ -255,7 +255,7 @@
             <button class="btn btn-danger" onclick="resetAll()">
                 <i class="fa-solid fa-rotate-left"></i> ZERAR DELAYS
             </button>
-            <div class="status" id="status">Aguardando ficheiro...</div>
+            <div class="status" id="status">Aguardando arquivo...</div>
         </div>
     </header>
 
@@ -330,7 +330,6 @@
     let audioCtx, source, masterGain;
     let bands = [];
     
-    // Arrays de Estado Isolados e Protegidos
     let manualDelays = new Array(freqs.length).fill(0);
     let groupOffsets = { sub: 0, low: 0, mid: 0, high: 0 };
 
@@ -376,19 +375,16 @@
 
             bands.push({ filter, delay, freq: f });
 
-            // Evento estável de arrasto do slider horizontal
             document.getElementById(`fader-${i}`).addEventListener('input', (e) => {
                 manualDelays[i] = parseFloat(e.target.value) || 0;
                 processDataFlow(i, 'fader');
             });
             
-            // Evento estável de introdução na caixa numérica
             document.getElementById(`delay-${i}`).addEventListener('change', (e) => {
                 let inputVal = parseFloat(e.target.value) || 0;
                 inputVal = Math.max(0, Math.min(250, inputVal));
                 
                 const group = getGroupName(f);
-                // O valor digitado define o ponto final, adaptando a posição do fader em conformidade
                 manualDelays[i] = Math.max(0, inputVal - groupOffsets[group]);
                 
                 processDataFlow(i, 'input');
@@ -403,20 +399,15 @@
         return 'high';
     }
 
-    // Fluxo de Processamento Unidirecional (Imutável, Sem Loops)
     function processDataFlow(i, origin) {
         const freq = freqs[i];
         const group = getGroupName(freq);
-        
-        // Cálculo Real Consolidado: Valor Próprio da Banda + Offset de Deslocamento do Grupo
         const calculatedTotal = Math.max(0, manualDelays[i] + groupOffsets[group]);
 
-        // 1. Atualização Instantânea no Motor de Áudio
         if (audioCtx && bands[i]) {
             bands[i].delay.delayTime.setTargetAtTime(calculatedTotal / 1000, audioCtx.currentTime, 0.005);
         }
 
-        // 2. Sincronização Estrita da Interface Visual
         const inputField = document.getElementById(`delay-${i}`);
         const faderField = document.getElementById(`fader-${i}`);
 
@@ -427,7 +418,6 @@
         }
     }
 
-    // Controlo de Alteração do Grupo Macro
     window.updateGroup = (group, val) => {
         const parsedVal = parseFloat(val);
         groupOffsets[group] = parsedVal;
@@ -471,8 +461,12 @@
         initAudio();
         if (source) source.disconnect();
         
+        // CORREÇÃO DO ECO: O sinal original do elemento de áudio NÃO vaza para a saída nativa do browser.
+        audio.muted = false; 
+        
         source = audioCtx.createMediaElementSource(audio);
         
+        // Roteamento exclusivo pelo motor DSP. O som passa pelas bandas e deságua apenas no masterGain
         bands.forEach(b => {
             source.connect(b.filter);
             b.filter.connect(b.delay);
@@ -490,7 +484,15 @@
             }
         };
         
-        status.innerText = "Faders horizontais nativos ativos. Pronto.";
+        status.innerText = "Alinhador puro ativo. Duplicação de áudio corrigida.";
+    }
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('ALIGN DSP: Service Worker Ativo', reg.scope))
+            .catch(err => console.log('Erro ao registrar SW:', err));
+        });
     }
 </script>
 </body>
